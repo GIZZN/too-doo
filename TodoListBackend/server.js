@@ -47,7 +47,7 @@ function authenticateToken(req, res, next) {
 
 app.get('/api/tasks', authenticateToken, async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM tasksr WHERE userId = $1', [req.user.userId]);
+        const result = await pool.query('SELECT * FROM tasks WHERE userId = $1', [req.user.userId]);
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -57,8 +57,8 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
 app.delete('/api/deleteTask', async (req, res) => {
     let { id } = req.body
     try {
-        await pool.query('DELETE FROM tasksr WHERE id = $1', [id]);
-        const result = await pool.query('SELECT * FROM tasksr');
+        await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
+        const result = await pool.query('SELECT * FROM tasks');
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -70,8 +70,8 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
     console.log(req.user);
 
     try {
-        await pool.query('INSERT INTO tasksr (text, isChecked, userId) VALUES ($1, $2, $3)', [text, isChecked, req.user.userId]);
-        const result = await pool.query('SELECT * FROM tasksr');
+        await pool.query('INSERT INTO tasks (text, isChecked, userId) VALUES ($1, $2, $3)', [text, isChecked, req.user.userId]);
+        const result = await pool.query('SELECT * FROM tasks');
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -132,10 +132,10 @@ app.put('/api/tasks/:id',authenticateToken, async (req, res) => {
     
     try {
         if (typeof currentData === 'boolean') {
-            let result = await pool.query('UPDATE tasksr SET ischecked = $1 WHERE userid = $2 AND id = $3', [currentData, req.user.userId, id])
+            let result = await pool.query('UPDATE tasks SET ischecked = $1 WHERE userid = $2 AND id = $3', [currentData, req.user.userId, id])
             res.json(result.rows);
         } else if (typeof currentData === 'string') {
-            let result = await pool.query('UPDATE tasksr SET text = $1 WHERE userid = $2 AND id = $3', [currentData, req.user.userId, id])
+            let result = await pool.query('UPDATE tasks SET text = $1 WHERE userid = $2 AND id = $3', [currentData, req.user.userId, id])
             res.json(result.rows);
         } else {
             console.log('ошибка');
